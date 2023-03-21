@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tiptime.ui.theme.TipTimeTheme
+import java.text.NumberFormat
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,8 +38,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun TipTimeScreen() {
     Column(
-        modifier = Modifier.padding(32.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = Modifier.padding(32.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
             text = stringResource(R.string.calculate_tip),
@@ -48,6 +48,13 @@ fun TipTimeScreen() {
         )
         Spacer(Modifier.height(16.dp))
         EditNumberField()
+        Spacer(Modifier.height(24.dp))
+        Text(
+            text = stringResource(R.string.tip_amount, ""),
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
 
     }
 }
@@ -57,8 +64,10 @@ fun EditNumberField() {
     var amountInput by remember {
         mutableStateOf("")
     }
+    val amount = amountInput.toDoubleOrNull() ?: 0.0
+    val tip = calculateTip(amount)
     TextField(
-        label = { Text(text = stringResource(id = R.string.cost_of_service))},
+        label = { Text(text = stringResource(id = R.string.cost_of_service)) },
         value = amountInput,
         onValueChange = {
             amountInput = it
@@ -67,6 +76,14 @@ fun EditNumberField() {
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
     )
+}
+
+private fun calculateTip(
+    amount: Double,
+    tipPercent: Double = 15.0,
+): String {
+    val tip = tipPercent / 100 * amount
+    return NumberFormat.getCurrencyInstance().format(tip)
 }
 
 @Preview(showSystemUi = true)
