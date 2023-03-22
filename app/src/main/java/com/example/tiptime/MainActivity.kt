@@ -37,6 +37,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun TipTimeScreen() {
+    var amountInput by remember {
+        mutableStateOf("")
+    }
+    val amount = amountInput.toDoubleOrNull() ?: 0.0
+    val tip = calculateTip(amount)
     Column(
         modifier = Modifier.padding(32.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -47,31 +52,25 @@ fun TipTimeScreen() {
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
         Spacer(Modifier.height(16.dp))
-        EditNumberField()
+        EditNumberField(value = amountInput, onValueChanged = {
+            amountInput = it
+        })
         Spacer(Modifier.height(24.dp))
         Text(
-            text = stringResource(R.string.tip_amount, ""),
+            text = stringResource(R.string.tip_amount, tip),
             modifier = Modifier.align(Alignment.CenterHorizontally),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
-
     }
 }
 
 @Composable
-fun EditNumberField() {
-    var amountInput by remember {
-        mutableStateOf("")
-    }
-    val amount = amountInput.toDoubleOrNull() ?: 0.0
-    val tip = calculateTip(amount)
+fun EditNumberField(value: String, onValueChanged: (String) -> Unit) {
     TextField(
         label = { Text(text = stringResource(id = R.string.cost_of_service)) },
-        value = amountInput,
-        onValueChange = {
-            amountInput = it
-        },
+        value = value,
+        onValueChange = onValueChanged,
         modifier = Modifier.fillMaxWidth(),
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
