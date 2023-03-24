@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -12,6 +13,8 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -47,6 +50,7 @@ fun TipTimeScreen() {
     val amount = amountInput.toDoubleOrNull() ?: 0.0
     val tipPercent = tipInput.toDoubleOrNull() ?: 0.0
     val tip = calculateTip(amount, tipPercent)
+    val focusManager = LocalFocusManager.current
 
 
     Column(
@@ -66,7 +70,10 @@ fun TipTimeScreen() {
                 imeAction = ImeAction.Next
             ),
             value = amountInput,
-            onValueChanged = { amountInput = it }
+            onValueChanged = { amountInput = it },
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+            )
         )
         EditNumberField(
             label = R.string.how_was_the_service,
@@ -75,6 +82,9 @@ fun TipTimeScreen() {
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = { focusManager.clearFocus() }
             )
         )
         Spacer(Modifier.height(24.dp))
@@ -93,7 +103,8 @@ fun EditNumberField(
     value: String,
     onValueChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
-    keyboardOptions: KeyboardOptions
+    keyboardOptions: KeyboardOptions,
+    keyboardActions: KeyboardActions,
 ) {
     TextField(
         label = { Text(text = stringResource(label)) },
@@ -101,7 +112,8 @@ fun EditNumberField(
         onValueChange = onValueChanged,
         modifier = modifier.fillMaxWidth(),
         singleLine = true,
-        keyboardOptions = keyboardOptions
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions
     )
 }
 
